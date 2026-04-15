@@ -1,4 +1,4 @@
-import config from "../config.js";
+import conf from "../conf.js";
 
 import { Client, Account, ID } from "appwrite";
 
@@ -8,30 +8,31 @@ export class AuthService {
 
   constructor() {
     this.client
-      .setEndpoint(config.appwriteUrl)
-      .setProject(config.appwriteProjectId);
+      .setEndpoint(conf.appwriteUrl)
+      .setProject(conf.appwriteProjectId);
 
     this.account = new Account(this.client);
   }
 
-  async createAccount({ password, email, name }) {
-    try {
-      const userAccount = await this.account.create(
-        ID.unique(),
-        email,
-        password,
-        name,
-      );
+  async createAccount({ email, password, name }) {
+  try {
+    const userAccount = await this.account.create(
+      ID.unique(),
+      email,
+      password,
+      name
+    );
 
-      if (userAccount) {
-        // call another method
-        return this.login({ email, password });
-      }
-      return userAccount;
-    } catch (error) {
-      throw error;
-    }
+    if (!userAccount) return null;
+
+    await this.login({ email, password });
+    return userAccount;
+
+  } catch (error) {
+    console.error("Signup failed:", error.message);
+    throw error;
   }
+}
 
   async login({ email, password }) {
     try {
