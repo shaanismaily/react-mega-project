@@ -1,17 +1,83 @@
-import { createRoot } from 'react-dom/client'
-import './index.css'
-import App from './App.jsx'
-import { StrictMode } from 'react'
-import { Provider } from 'react-redux'
-import store from './store/store.js'
-import { BrowserRouter } from 'react-router-dom'
+import { createRoot } from "react-dom/client";
+import "./index.css";
+import App from "./App.jsx";
+import { StrictMode } from "react";
+import { Provider } from "react-redux";
+import store from "./store/store.js";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { AuthLayout, Login } from "./components/index.js";
 
-createRoot(document.getElementById('root')).render(
-    <StrictMode>
+import Home from "./components/pages/Home.jsx";
+import Signup from "./components/pages/Signup.jsx";
+import AddPost from "./components/pages/AddPost.jsx";
+import EditPost from "./components/pages/EditPost.jsx";
+import AllPosts from "./components/pages/AllPosts.jsx";
+import Post from "./components/pages/Post.jsx";
+
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <App />,
+    children: [
+      {
+        path: "/home",
+        element: <Home />,
+      },
+      {
+        path: "/login",
+        element: (
+          <AuthLayout authentication={false}>
+            <Login />
+          </AuthLayout>
+        ),
+      },
+      {
+        path: "/signup",
+        element: (
+          <AuthLayout authentication={false}>
+            <Signup />
+          </AuthLayout>
+        ),
+      },
+      {
+        path: "/all-posts",
+        element: (
+          <AuthLayout authentication>
+            {" "}
+            <AllPosts />
+          </AuthLayout>
+        ),
+      },
+      {
+        path: "/add-post",
+        element: (
+          <AuthLayout authentication>
+            {" "}
+            <AddPost />
+          </AuthLayout>
+        ),
+      },
+      {
+        path: "/edit-post/:slug",
+        element: (
+          <AuthLayout authentication>
+            {" "}
+            <EditPost />
+          </AuthLayout>
+        ),
+      },
+      {
+        path: "/post/:slug",
+        element: <Post />,
+      },
+    ],
+  },
+]);
+
+createRoot(document.getElementById("root")).render(
+  <StrictMode>
     <Provider store={store}>
-        <BrowserRouter>
-            <App />
-        </BrowserRouter>
+      <RouterProvider router={router} />
     </Provider>
-    </StrictMode>
-)
+  </StrictMode>,
+);

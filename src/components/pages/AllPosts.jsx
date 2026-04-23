@@ -19,3 +19,5 @@ function AllPosts() {
         </Container>
     )
 }
+
+export default AllPosts;

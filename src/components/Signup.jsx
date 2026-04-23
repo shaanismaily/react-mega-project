@@ -1,13 +1,13 @@
-import React, { use, useState } from "react";
+import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate, Link } from "react-router-dom";
 import authService from "../appwrite/auth";
 import { useForm } from "react-hook-form";
 import { login } from "../store/authSlice";
-import {Button, Input, Logo} from "./index"
+import { Button, Input, Logo } from "./index";
 
 function Signup() {
-  const [error, setError] = "";
+  const [error, setError] = useState("");
   const { register, handleSubmit } = useForm();
 
   const dispatch = useDispatch();
@@ -26,6 +26,7 @@ function Signup() {
         navigate("/");
       }
     } catch (error) {
+      console.error("Signup failed:", error);
       setError(error.message);
     }
   };
@@ -54,7 +55,7 @@ function Signup() {
         </p>
         {error && <p className="text-red-600 mt-8 text-center">{error}</p>}
 
-        <form onSubmit={handleSubmit(login)}>
+        <form onSubmit={handleSubmit(create)}>
           <div className="space-y-5">
             <Input
               type="text"
@@ -69,7 +70,7 @@ function Signup() {
               type="email"
               label="Email: "
               placeholder="e.g., johndoe@example.com"
-              {...register("name", {
+              {...register("email", {
                 required: true,
                 validate: {
                   matchPattern: (value) =>
