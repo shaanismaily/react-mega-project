@@ -22,7 +22,12 @@ function Login({ email, password }) {
       if (session) {
         const userData = await authService.getCurrentUser();
 
-        if (userData) dispatch(authLogin(userData));
+        if (userData)
+          dispatch(
+            login({
+              userData: JSON.parse(JSON.stringify(userData)),
+            }),
+          );
         navigate("/");
       }
     } catch (error) {

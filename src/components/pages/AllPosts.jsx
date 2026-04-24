@@ -1,23 +1,36 @@
-import {Container, PostCard} from "../index";
-import appwriteService from "../../appwrite/config"
+import { Container, PostCard } from "../index";
+import appwriteService from "../../appwrite/config";
 import { useEffect, useState } from "react";
 
 function AllPosts() {
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-    const [posts, setPosts] = useState([]);
+  useEffect(() => {
+    appwriteService
+      .getPosts()
+      .then((res) => res && setPosts(res.rows))
+      .catch((err) => {
+        console.error("Failed to fetch posts:", err);
+      })
+      .finally(() => setLoading(false));
+  }, []);
 
-    useEffect(() => {
-        appwriteService.getPosts([]).then((post) => setPosts(post))
-    }, [])
-    return (
-        <Container>
-            {posts.map(post => (
-                <div key={post.$id}>
-                    <PostCard post={post}/>
-                </div>
-            ))}
-        </Container>
-    )
+  if (loading) return <p>Loading...</p>;
+
+  return (
+    <Container>
+      {posts.map((post) => (
+        <div key={post.$id}>
+          <PostCard
+            $id={post.$id}
+            title={post.title}
+            featuredImage={post.featuredImage}
+          />
+        </div>
+      ))}
+    </Container>
+  );
 }
 
 export default AllPosts;

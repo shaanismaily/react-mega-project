@@ -31,26 +31,31 @@ export default function PostForm({ post }) {
           ? await appwriteService.uploadFile(data.image[0])
           : null;
 
-        if (file) {
+        if (file && post?.featuredImage) {
           await appwriteService.deleteFile(post.featuredImage);
         }
+        const {image, ...rest} = data;
 
         const dbPost = await appwriteService.updatePost(post.$id, {
-          ...data,
-          featuredImage: file ? file.$id : undefined,
+          ...rest,
+          featuredImage: file ? file.$id : post.featuredImage,
         });
 
         if (dbPost) {
           navigate(`/post/${dbPost.$id}`);
         }
       } else {
+        if (!data.image || !data.image[0]) {
+          console.error("Image is required");
+          return;
+        }
         const file = await appwriteService.uploadFile(data.image[0]);
 
         if (file) {
-          data.featuredImage = file.$id;
-          
+          const {image, ...rest} = data;
           const dbPost = await appwriteService.createPost({
-            ...data,
+            ...rest,
+            featuredImage: file.$id,
             userId: userData.$id,
           });
 
@@ -120,7 +125,7 @@ export default function PostForm({ post }) {
         {post && (
           <div className="w-full mb-4">
             <img
-              src={appwriteService.getFilePreview(post.featuredImage)}
+              src={appwriteService.getFileView(post.featuredImage)}
               alt={post.title}
               className="rounded-lg"
             />

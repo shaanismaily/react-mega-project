@@ -15,30 +15,46 @@ function Post() {
 
   useEffect(() => {
     if (slug) {
-      appwriteService.getPost().then((post) => {
-        if (post) setPost(post);
-        navigate("/");
-      });
-    } else navigate("/");
-  }, [slug, navigate]);
-
-  const deletePost = () => {
-    appwriteService.deletePost(post$.id).then((status) => {
-      if (status) {
-        appwriteService.deleteFile(post.featuredImage);
+      appwriteService.getPost(slug).then((post) => {
+        if (post) {
+        setPost(post);
+      } else {
         navigate("/");
       }
-    });
-  };
+      });
+    } else {
+      navigate("/");
+    }
+  }, [slug, navigate]);
+
+  const deletePost = async () => {
+  try {
+    const status = await appwriteService.deletePost(post.$id);
+
+    if (status) {
+      if (post.featuredImage) {
+        try {
+          await appwriteService.deleteFile(post.featuredImage);
+        } catch (fileError) {
+          console.error("File delete failed:", fileError);
+        }
+      }
+
+      navigate("/");
+    }
+  } catch (error) {
+    console.error("Post delete failed:", error);
+  }
+};
 
   return post ? (
     <div className="py-8">
       <Container>
         <div className="w-full flex justify-center mb-4 relative border rounded-xl p-2">
           <img
-            src={appwriteService.getFilePreview(post.featuredImage)}
+            src={appwriteService.getFileView(post.featuredImage).toString()}
             alt={post.title}
-            className="rounded-xl"
+            className="rounded-xl w-75"
           />
 
           {isAuthor && (
